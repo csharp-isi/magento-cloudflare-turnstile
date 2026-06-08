@@ -14,6 +14,7 @@ use Exception;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\Request\Http as Request;
 use Magento\Framework\App\Response\Http as Response;
+use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Message\ManagerInterface;
@@ -28,6 +29,8 @@ abstract class Validate implements ObserverInterface
     protected ManagerInterface $messageManager;
 
     protected Response $response;
+
+    protected RedirectInterface $redirect;
 
     protected Validator $validator;
 
@@ -55,6 +58,7 @@ abstract class Validate implements ObserverInterface
     public function __construct(
         ManagerInterface $messageManager,
         Response $response,
+        RedirectInterface $redirect,
         Validator $validator,
         Json $json,
         Config $config,
@@ -63,6 +67,7 @@ abstract class Validate implements ObserverInterface
     ) {
         $this->messageManager = $messageManager;
         $this->response       = $response;
+        $this->redirect       = $redirect;
         $this->validator      = $validator;
         $this->json           = $json;
         $this->config         = $config;
@@ -114,9 +119,7 @@ abstract class Validate implements ObserverInterface
     protected function error(Phrase $message): void
     {
         $this->messageManager->addErrorMessage($message);
-        $this->response->setRedirect($this->request?->getServer('HTTP_REFERER', '/') ?? '/');
-
-        $this->response->sendResponse();
+        $this->redirect->redirect($this->action->getResponse(), $this->redirect->getRefererUrl());
         exit();
     }
 
