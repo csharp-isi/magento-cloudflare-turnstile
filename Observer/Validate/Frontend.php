@@ -13,6 +13,7 @@ namespace PixelOpen\CloudflareTurnstile\Observer\Validate;
 use Magento\Customer\Controller\Ajax\Login as AjaxLoginPost;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Response\Http as Response;
+use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Phrase;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -38,6 +39,7 @@ class Frontend extends Validate
     public function __construct(
         ManagerInterface $messageManager,
         Response $response,
+        RedirectInterface $redirect,
         Validator $validator,
         Json $json,
         Config $config,
@@ -47,7 +49,7 @@ class Frontend extends Validate
     ) {
         $this->customerSession = $customerSession;
 
-        parent::__construct($messageManager, $response, $validator, $json, $config, $persistor, $data);
+        parent::__construct($messageManager, $response, $redirect, $validator, $json, $config, $persistor, $data);
     }
 
 
