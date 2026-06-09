@@ -48,7 +48,6 @@ abstract class Validate implements ObserverInterface
 
     /**
      * @param ManagerInterface $messageManager
-     * @param Response $response
      * @param Validator $validator
      * @param Json $json
      * @param Config $config
@@ -57,7 +56,6 @@ abstract class Validate implements ObserverInterface
      */
     public function __construct(
         ManagerInterface $messageManager,
-        Response $response,
         RedirectInterface $redirect,
         Validator $validator,
         Json $json,
@@ -66,7 +64,6 @@ abstract class Validate implements ObserverInterface
         array $data = []
     ) {
         $this->messageManager = $messageManager;
-        $this->response       = $response;
         $this->redirect       = $redirect;
         $this->validator      = $validator;
         $this->json           = $json;
@@ -83,8 +80,9 @@ abstract class Validate implements ObserverInterface
      */
     public function execute(Observer $observer): void
     {
-        $this->action = $observer->getEvent()->getData('controller_action');
-        $this->request = $observer->getEvent()->getData('request');
+        $this->action   = $observer->getEvent()->getData('controller_action');
+        $this->request  = $observer->getEvent()->getData('request');
+        $this->response = $this->action->getResponse();
 
         if ($this->canValidate()) {
             try {
@@ -119,7 +117,8 @@ abstract class Validate implements ObserverInterface
     protected function error(Phrase $message): void
     {
         $this->messageManager->addErrorMessage($message);
-        $this->redirect->redirect($this->action->getResponse(), $this->redirect->getRefererUrl());
+        $this->redirect->redirect($this->response, $this->redirect->getRefererUrl());
+
         exit();
     }
 
